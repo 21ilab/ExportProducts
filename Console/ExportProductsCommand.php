@@ -9,7 +9,9 @@ namespace Twentyone\ExportProducts\Console;
 
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
-use Magento\Store\Model\StoreFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use PhpOffice\PhpSpreadsheet\Writer\Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,17 +58,27 @@ class ExportProductsCommand extends Command
      * @return void
      */
     protected function execute(InputInterface $input, OutputInterface $output) {
-        $attributes = $input->getArgument('attributes');
         $this->path = $input->getArgument('path');
         $this->storeId = $input->getArgument('store');
+        $output->writeln("Process started to export products from store: ".$this->storeId."\n");
         $this->attributes = $input->getArgument('attributes');
         $this->labels = $input->getArgument('labels');
         $this->delimiter = $input->getArgument('delimiter');
         $this->encapsulator = $input->getArgument('encapsulator');
-        $this->getProducts($this->storeId);
-        var_dump(get_class($this->getStore()));
-        $output->writeln(explode(',', $attributes));
-        $output->writeln("test");
+        $productsCollection = $this->getProducts($this->storeId);
+        $attributes = explode(',', $this->attributes);
+        $labels = explode(',', $this->labels);
+        $products = $this->prepareProductsWithLabels($productsCollection, $attributes, $labels);
+
+        //save CSV
+        try {
+            $this->makeCSVWithProducts($this->path, $products, $labels, $this->delimiter, $this->encapsulator);
+            $output->writeln("File is saved in below line\n".__DIR__."/".$this->path);
+        } catch (Exception $e) {
+            $output->writeln($e->getMessage());
+        } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+            $output->writeln($e->getMessage());
+        }
     }
 
     /**
@@ -80,14 +92,53 @@ class ExportProductsCommand extends Command
         $collection = $this->collectionFactory->create();
         $collection->addAttributeToSelect('*');
         $collection->addStoreFilter($storeId);
+
+        //$collection->setPage(1, 3);
         /*
-        $collection->setPage(1, 2);
         foreach ($collection as $product) {
             var_dump($product->getData());die;
-            //
         }
         */
+
         return $collection;
+    }
+
+    /**
+     * @param Collection $collection
+     * @param array $attributes
+     * @param array $labels
+     * @return array
+     */
+    private function prepareProductsWithLabels(Collection $collection, $attributes, $labels) {
+        $returnProducts = [];
+        foreach ($collection as $product) {
+            $prod = [];
+            foreach ($attributes as $key => $attribute) {
+                if (isset($product[$attribute])) {
+                    $prod[$labels[$key]] = $product[$attribute];
+                }
+            }
+            $returnProducts[] = $prod;
+        }
+        return $returnProducts;
+    }
+
+    /**
+     * @param string $path
+     * @param array $products
+     * @return void
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     */
+    private function makeCSVWithProducts($path, $products, $labels, $delimiter, $encapsulator) {
+        $doc = new Spreadsheet();
+        $sheet = $doc->getActiveSheet();
+        $sheet->fromArray($labels);
+        $sheet->fromArray($products,null, 'A2');
+        $csv = new Csv($doc);
+        $csv->setDelimiter($delimiter);
+        $csv->setEnclosure($encapsulator);
+        $csv->save(__DIR__."/".$path);
     }
 
 }
