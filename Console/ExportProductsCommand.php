@@ -21,7 +21,6 @@ class ExportProductsCommand extends Command
     protected $path, $storeId, $attributes, $labels, $delimiter, $encapsulator, $collectionFactory;
 
     public function __construct(CollectionFactory $collectionFactory) {
-        $this->storeFactory = $storeFactory;
         $this->collectionFactory = $collectionFactory;
         parent::__construct();
     }
@@ -40,11 +39,12 @@ class ExportProductsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $attributes = $input->getArgument('attributes');
-        $this->path = $input->getArgument('store');
+        $this->path = $input->getArgument('path');
         $this->storeId = $input->getArgument('store');
-        $this->storeId = $input->getArgument('store');
-        $this->storeId = $input->getArgument('store');
-        $this->storeId = $input->getArgument('store');
+        $this->attributes = $input->getArgument('attributes');
+        $this->labels = $input->getArgument('labels');
+        $this->delimiter = $input->getArgument('delimiter');
+        $this->encapsulator = $input->getArgument('encapsulator');
         $this->getProducts($this->storeId);
         var_dump(get_class($this->getStore()));
         $output->writeln(explode(',', $attributes));
