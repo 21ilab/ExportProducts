@@ -7,6 +7,7 @@
 
 namespace Twentyone\ExportProducts\Console;
 
+use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Store\Model\StoreFactory;
 use Symfony\Component\Console\Command\Command;
@@ -20,11 +21,20 @@ class ExportProductsCommand extends Command
 
     protected $path, $storeId, $attributes, $labels, $delimiter, $encapsulator, $collectionFactory;
 
+    /**
+     * Inject CollectionFactory(products) so to query products of magento and filter
+     *
+     * ExportProductsCommand constructor.
+     * @param CollectionFactory $collectionFactory
+     */
     public function __construct(CollectionFactory $collectionFactory) {
         $this->collectionFactory = $collectionFactory;
         parent::__construct();
     }
 
+    /**
+     * Configure console command and arguments and options required
+     */
     protected function configure() {
         $this->setName('Twentyone:ExportProducts');
         $this->setDescription('Export products from magento catalog');
@@ -37,6 +47,14 @@ class ExportProductsCommand extends Command
         $this->addArgument('encapsulator', InputArgument::REQUIRED, 'Encapsulator');
     }
 
+    /**
+     * This function is executed after the console command is types in terminal
+     * get the user entered arguments and options and do the magic
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return void
+     */
     protected function execute(InputInterface $input, OutputInterface $output) {
         $attributes = $input->getArgument('attributes');
         $this->path = $input->getArgument('path');
@@ -51,6 +69,13 @@ class ExportProductsCommand extends Command
         $output->writeln("test");
     }
 
+    /**
+     * Get products by store ID
+     * from CollectionFactory and return Collection of products
+     *
+     * @param int $storeId
+     * @return Collection
+     */
     private function getProducts($storeId) {
         $collection = $this->collectionFactory->create();
         $collection->addAttributeToSelect('*');
