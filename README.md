@@ -17,3 +17,7 @@ Usage
 ---
 ```php bin/magento Twentyone:Exportroducts "{path}" "{store}" "{attributes}" "{labels}" "{delimiter}" "{encapsulator}"```
  
+Composer Require
+---
+Please require below packages in magento 2(composer json)
+```composer require phpoffice/phpspreadsheet```
