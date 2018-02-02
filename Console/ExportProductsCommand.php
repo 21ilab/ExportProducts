@@ -138,7 +138,7 @@ class ExportProductsCommand extends Command
         $sheet->fromArray($products,null, 'A2');
         $csv = new Xls($doc);
         //$csv->setDelimiter($delimiter);
-        $csv->setEnclosure($encapsulator);
+        //$csv->setEnclosure($encapsulator);
         $csv->save(__DIR__."/".$path);
     }
 
