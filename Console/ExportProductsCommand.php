@@ -59,7 +59,6 @@ class ExportProductsCommand extends Command
      * @return void
      */
     protected function execute(InputInterface $input, OutputInterface $output) {
-        var_dump(getenv('crypt'));die;
         $this->path = $input->getArgument('path');
         $this->storeId = $input->getArgument('store');
         $output->writeln("Process started to export products from store: ".$this->storeId."\n");
