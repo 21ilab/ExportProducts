@@ -1,5 +1,5 @@
 {
-  "name": "Twentyone/ExportProducts",
+  "name": "ahmed-oz/magento-export-products",
   "description": "Export products with instructions of where to save and which attributes to export",
   "type": "magento2-module",
   "require": {
@@ -13,7 +13,6 @@
       "Twentyone\\ExportProducts\\": ""
     }
   },
-  "version": "1.0",
   "authors": [
     {
       "name": "Afroze Shaik"

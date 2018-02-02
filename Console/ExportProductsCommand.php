@@ -12,6 +12,7 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use PhpOffice\PhpSpreadsheet\Writer\Exception;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,7 +27,7 @@ class ExportProductsCommand extends Command
     /**
      * Inject CollectionFactory(products) so to query products of magento and filter
      *
-     * ExportProductsCommand constructor.
+     * CronProductsCommand constructor.
      * @param CollectionFactory $collectionFactory
      */
     public function __construct(CollectionFactory $collectionFactory) {
@@ -58,6 +59,7 @@ class ExportProductsCommand extends Command
      * @return void
      */
     protected function execute(InputInterface $input, OutputInterface $output) {
+        var_dump(getenv('crypt'));die;
         $this->path = $input->getArgument('path');
         $this->storeId = $input->getArgument('store');
         $output->writeln("Process started to export products from store: ".$this->storeId."\n");
@@ -135,8 +137,8 @@ class ExportProductsCommand extends Command
         $sheet = $doc->getActiveSheet();
         $sheet->fromArray($labels);
         $sheet->fromArray($products,null, 'A2');
-        $csv = new Csv($doc);
-        $csv->setDelimiter($delimiter);
+        $csv = new Xls($doc);
+        //$csv->setDelimiter($delimiter);
         $csv->setEnclosure($encapsulator);
         $csv->save(__DIR__."/".$path);
     }
