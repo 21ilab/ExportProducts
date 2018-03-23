@@ -117,6 +117,8 @@ class ExportProductsCommand extends Command
             foreach ($attributes as $key => $attribute) {
                 if (isset($product[$attribute])) {
                     $prod[$labels[$key]] = $product[$attribute];
+                } else {
+                    $prod[$labels[$key]] = '';
                 }
             }
             $returnProducts[] = $prod;
